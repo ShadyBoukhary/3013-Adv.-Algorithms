@@ -1,5 +1,7 @@
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*	Shady Boukhary													+
+*	Author: Shady Boukhary													+
+*	Email: sb199898.sb@gmail.com									+
+*	Files: main.cpp													+
 *	3013- Advanced Structures and Algorithms						+
 *	Due January 25th, 2018											+
 *	Dr. Terry Griffin												+
