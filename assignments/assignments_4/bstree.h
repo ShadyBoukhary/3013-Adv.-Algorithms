@@ -46,17 +46,17 @@ class BSTree
   private:
 
     node *root;
-    int count(node *root);
+    int count(node *);
 
 
 
 
-    void insert(node *&root, node *&temp);
+    void insert(node *&, node *&);
 
 
 
 
-    void print_node(node *n, string label = "");
+    void print_node(node *, string);
 
 
 
@@ -66,11 +66,11 @@ class BSTree
 
      */
 
-    node *minValueNode(node *root);
+    node *minValueNode(node *);
 
 
 
-    node *deleteNode(node *&root, int key);
+    node *deleteNode(node *&, int);
 
     
 
@@ -94,7 +94,7 @@ class BSTree
 
     /* Print nodes at a given level */
 
-    void printGivenLevel(node *root, int level);
+    void printGivenLevel(node *, int);
 
     //************************************************************************
 
@@ -154,7 +154,7 @@ class BSTree
 
     void minValue();
 
-    int height(int key = -1);
+    int height(int key);
 
 
 
