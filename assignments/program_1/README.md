@@ -1,12 +1,9 @@
-*	Shady Boukhary													
-*	3013- Advanced Structures and Algorithms						
-*	Due January 25th, 2018											
-*	Dr. Terry Griffin		
+Name: Shady Boukhary
+Date: Januray 25th, 2018
+Assignment: Program 1
+Description:
+    Priority Queue Driver Program. Inserts random numbers into a priorty queue, dequeues and prints the dequeued
+    numbers.
 
-*	Purpose: Simple program to revise implementation of priority	
-*	queue. The program initializes a list with random numbers	
-*	inserted in ascending order. Finally, it prints that list to	
-*	the console.
-
-* Files:
-  main.cpp
+Files: 
+    - main.cpp
