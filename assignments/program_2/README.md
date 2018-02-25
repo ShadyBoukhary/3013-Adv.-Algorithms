@@ -1,11 +1,11 @@
-Name: Shady Boukhary
+* Name: Shady Boukhary
 
-Date: February 13th
-Assignment: Program 2
-Description:
+* Date: February 13th
+* Assignment: Program 2
+* Description:
     Driver Program for A BSTree
 
-Files:
+* Files:
     - bstree.cpp
     - bstree.h 
     - main.cpp
