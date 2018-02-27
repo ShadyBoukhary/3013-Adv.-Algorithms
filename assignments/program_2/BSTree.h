@@ -1,97 +1,43 @@
 #pragma once
-
-
 struct node
-
 {
-
     int data;
-
     node *left;
-
     node *right;
-
     node()
-
     {
-
         data = -1;
-
         left = NULL;
-
         right = NULL;
-
     }
-
     node(int x)
-
     {
-
         data = x;
-
         left = NULL;
-
         right = NULL;
-
     }
-
 };
 
-
-
 class BSTree
-
 {
-
   private:
-
     node *root;
     int count(node *);
-
-
-
-
     void insert(node *&, node *&);
-
-
-
-
     void print_node(node *, string);
-
-
-
     /**
 
      * type = ['predecessor','successor']
 
      */
-
     node *minValueNode(node *);
-
-
-
     node *deleteNode(node *&, int);
-
-    
-
-
-
-
             // node with two children: Get the inorder successor (smallest
 
             // in the right subtree)
 
     node *temp = minValueNode(root);
-
-
-
-
-
     int height(node *root);
-
-
-
-
     /* Print nodes at a given level */
 
     void printGivenLevel(node *, int);
@@ -111,10 +57,6 @@ class BSTree
     //************************************************************************
 
     void GraphVizGetIds(node *nodePtr, ofstream &VizOut);
-
-
-
-
     //************************************************************************
 
     // This method is partnered with the above method, but on this pass it
@@ -125,47 +67,19 @@ class BSTree
 
     // use the output as your told:)
 
-    //************************************************************************
-
+    //***********************************************************************
     void GraphVizMakeConnections(node *nodePtr, ofstream &VizOut);
-
-
-
-
   public:
-
     BSTree();
-
-
     ~BSTree();
-
-
-
     int count();
-
-
     void insert(int x);
-
-
-
     void deleteNode(int key);
-
-
-
     void minValue();
-
     int height(int key);
-
-
-
     int top();
-
-
     /* Function to line by line print level order traversal a tree*/
-
     void printLevelOrder();
-
-
     //************************************************************************
 
     // Recieves a filename to place the GraphViz data into.
@@ -175,8 +89,5 @@ class BSTree
     // that can be used to visualize your expression tree.
 
     //************************************************************************
-
     void GraphVizOut(string filename);
-
-
 };
