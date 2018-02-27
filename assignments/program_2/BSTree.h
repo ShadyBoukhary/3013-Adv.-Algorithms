@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <fstream>
+using namespace std;
 struct node
 {
     int data;
