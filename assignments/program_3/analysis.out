@@ -1,0 +1,21 @@
+Number of each type based on Tree comparisons (frequency of each type in crazy words): 
+
+Number of Adjectives: 14399
+Number of adverbs: 4070
+Number of Animals: 8805
+Number of Nouns: 4734
+Number of Verbs: 4707
+-------------------------------
+
+Actual number of each type present in the tree (words loaded from files)  
+
+Number of Adjectives: 11789
+Number of adverbs: 2696
+Number of Animals: 235
+Number of Nouns: 40527
+Number of Verbs: 6064
+-------------------------------
+
+
+Comparisons BST: 686356
+Comparisons AVL: 496151
