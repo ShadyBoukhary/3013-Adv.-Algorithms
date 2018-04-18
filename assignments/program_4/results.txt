@@ -2,3 +2,13 @@ San Juan,PR found at index 88
 Edge limit per vertex: 3
 148 edges.
 1296.97 miles.
+
+Dallas,TX found at index 18951
+Edge limit per vertex: 3
+28429 edges.
+998465 miles.
+
+Miami,FL found at index 18952
+Edge limit per vertex: 3
+28429 edges.
+1.87046e+06 miles.
