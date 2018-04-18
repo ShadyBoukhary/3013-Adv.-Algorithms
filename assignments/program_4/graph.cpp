@@ -163,7 +163,7 @@ vertex* Graph::createVertex(const std::string& c, const std::string& s, const la
 //          with the particular vertex added
 //////////////////////////////////////////////////////////////////////////////
 int Graph::addVertex(std::string c, std::string s, double lat = 0, double lon = 0) {
-    if(cityLookup.find(c) == cityLookup.end())
+    if(cityLookup.find(c + s) == cityLookup.end())
         cityLookup[c] = 0;          // add city as a key to the map
     else
         return -1;

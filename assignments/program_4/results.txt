@@ -1,0 +1,4 @@
+San Juan,PR found at index 88
+Edge limit per vertex: 3
+148 edges.
+1296.97 miles.

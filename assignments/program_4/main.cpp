@@ -1,3 +1,18 @@
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*										Shady Boukhary											*
+*									3013 Advanced Algorithms									*
+*									Thursday 18th, April 2018									*
+*										Dr. Terry Griffin										*
+*																								*
+*																								*
+*	This program constructs a graph of cities in the US according to user options. The user		*
+*	can choose to limit the graph to a specific state or include all - as well as setting		*
+*	a starting city. The program reads a file contatining 18.9K cities into a graph with		*
+*	no edges. Then it connects, starting with the city, the vertices to the closest cities		*
+*	around it.																					*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+
+
 #include <iostream>
 #include "csv.h"
 #include "distance.h"
@@ -10,15 +25,12 @@ using namespace std;
 typedef pair<double, int> distIndexPair;
 
 void loadGraph(string, Graph&);
-int num_of_lines(string);
 int search(Graph&, string, string);
 bool isValidEdge(Graph&, int, int, int);
 void connectGraph(Graph&);
-void closestEdges(Graph&);
 
 void getLimits(Graph&, int&, int&, string&, string&);
 void getClosestVertices(Graph&, distIndexPair[], int, int);
-//void randomEdges(Graph&, int);
 
 // Test Driver
 int main()
@@ -35,25 +47,15 @@ int main()
 	outfile.open("graphViz.dat");
 
 	loadGraph(filename, G);
-	G.printGraph();
+	//G.printGraph();
 	connectGraph(G);
 	//closestEdges(G);
-	system("pause");
 	//G.printGraph();
-	//closestEdges(G);
-	//randomEdges(G, 100);
+
 
 
 	outfile << G.graphViz(false);
-	//G.printVids();
 
-	//int *size = G.graphSize();
-
-	//cout << "V= " << size[0] << " E= " << size[1] << endl;
-
-	// for(int i=0;i<G.vertexList.size();i++){
-	//     cout<<(*G.vertexList[i])<<endl;
-	// }
 	int countZ = 0, count1 = 0, count2 = 0, count3 = 0;
 	for (int i = 0; i < G.vList.size(); i++) {
 		if (G.vList[i]->E.size() == 0)
@@ -73,6 +75,12 @@ int main()
 	return 0;
 }
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											loadGraph()											*
+*	parameters: string, Graph&																	*
+*	return: void																				*
+*	reads the input file of cities and adds them as vertices to a graph							*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void loadGraph(string filename, Graph &G) {
 	ifstream file(filename);
 
@@ -84,7 +92,7 @@ void loadGraph(string filename, Graph &G) {
 
 	cout << "What state do you wanna construct a graph for? (all for everything): ";
 	getline(cin, key);
-	//cin.ignore();
+	// read file 
 	while (!file.eof()) {
 		getline(file, strZip, ',');
 		getline(file, strLat, ',');
@@ -93,6 +101,7 @@ void loadGraph(string filename, Graph &G) {
 		getline(file, state, ',');
 		getline(file, county);
 
+		// convert from strings to ints and doubles
 		zip = stoi(strZip);
 		lat = stod(strLat);
 		lon = stod(strLon);
@@ -112,37 +121,44 @@ void loadGraph(string filename, Graph &G) {
 	file.close();
 }
 
-int num_of_lines(string filename) {
-	int numLines = 0;
-	string line;
-	ifstream file(filename);
 
-	while (getline(file, line))
-		numLines++;
-
-	return numLines;
-}
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											search()											*
+*	parameters: Graph&, string, state															*
+*	return: int																					*
+*	searches for a city in the graph, returns index if found, -1 if not found					*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int search(Graph &G, string key, string state) {
-	//cout << key << " " << state << endl;
 	for (int i = 0; i < G.vList.size(); i++)
 	{
 		if (G.vList[i]->city == key && G.vList[i]->state == state)
 		{
-			cout << G.vList[i]->city << "::" << G.vList[i]->state
-				<< "::" << i << " Found!" << endl;
+			cout << G.vList[i]->city << "," << G.vList[i]->state
+				<< " found at index " << i << endl;
 			return i;
 		}
 	}
 	return -1;
 }
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											isValidEdge()										*
+*	parameters: Graph&, int, int, int															*
+*	return: bool																				*
+*	determines whether 2 edges can be connected according to the limits set by user				*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 bool isValidEdge(Graph &G, int fromID, int toID, int edgePerV) {
 	return ((G.vList[fromID]->E.size() < edgePerV)
 		&& (G.vList[toID]->E.size() < edgePerV)
 		&& (fromID != toID));
 }
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											getClosestVertices()								*
+*	parameters: Graph&, distIndexPair, int, int													*
+*	return: void																				*
+*	creates an array of distance-index pairs filled with the closest vertices to a vertex		*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void getClosestVertices(Graph& graph, distIndexPair closestVectors[], int size, int indexStarting) {
 	latlon from, to;
 	double distance;
@@ -162,6 +178,12 @@ void getClosestVertices(Graph& graph, distIndexPair closestVectors[], int size, 
 	}
 }
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											connectGraph()										*
+*	parameters: Graph&																			*
+*	return: void																				*
+*	Connects the vertices in the graph according to limitations set by the user					*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void connectGraph(Graph& graph) {
 	int edgeLimit, indexStarting;
 	string startingCity;
@@ -224,14 +246,19 @@ void connectGraph(Graph& graph) {
 			q.pop();
 		}
 	}
-	cout << graph.getNumEdges() << " edges were created traveling in total "
+	cout << graph.getNumEdges() << " edges.\n"
 		<< totalDistance << " miles." << endl;
 
 }
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											getLimits()											*
+*	parameters: Graph&, int&, int&, string&, string&											*
+*	return: void																				*
+*	Gets the starting city to connect graphs and the edge limit per vertex from the user		*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void getLimits(Graph& graph, int& edgeLimit, int& index, string& starting, string& state) {
 	// get starting city
-	cout << "Enter the starting city: (eg. Dallas,TX)";
+	cout << "Enter the starting city: (eg. Dallas,TX) ";
 	getline(cin, starting, ',');
 	getline(cin, state);
 	index = search(graph, starting, state);
@@ -251,99 +278,3 @@ void getLimits(Graph& graph, int& edgeLimit, int& index, string& starting, strin
 	}
 }
 
-void closestEdges(Graph &G) {
-	//int edgePerV;
-	//int index;
-	//std::string keyCity;
-	//std::string keyState;
-	//double distance;
-	//double totDistance = 0;
-	//latlon from;
-	//latlon to;
-
-	//while (1) {
-	//	std::cout << "Enter Starting Location:\n(Ex. Wichita Falls,TX) ";
-	//	std::getline(std::cin, keyCity, ',');
-	//	std::getline(std::cin, keyState);
-
-	//	index = search(G, keyCity);
-
-	//	if (index == -1)
-	//		std::cout << keyCity << ',' << keyState << " not found!" << std::endl;
-	//	else if (index != -1)
-	//		break;
-	//}
-
-	//while (1) {
-	//	std::cout << "Edges per Vertex: ";
-	//	std::cin >> edgePerV;
-
-	//	if (std::cin.fail()) {
-	//		std::cout << "Enter a proper integer!" << std::endl;
-	//		std::cin.clear();
-	//		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	//	}
-	//	else
-	//		break;
-	//}
-
-	//distIndexPair * closestV = new distIndexPair[G.vList.size()];
-	////std::vector<distIndexPair> closestV;
-	//std::queue<distIndexPair> q;
-
-	//for (int j = 0; j < G.vList.size(); j++) {
-	//	// Get closest surrounding vertices
-	//	for (int i = 0; i < G.vList.size(); i++) {
-	//		from = G.vList[index]->location;
-	//		to = G.vList[i]->location;
-	//		distance = distanceEarth(from.lat, from.lon, to.lat, to.lon);
-	//		//closestV.push_back(std::make_pair(distance, i));
-	//		closestV[i] = make_pair(distance, i);
-	//	}
-	//	std::sort(closestV, closestV + G.vList.size());
-	//	q.emplace(closestV[0]);
-	//	bool first = true;
-	//	while (!q.empty()) {
-	//		int qCount = q.size() - 1;
-	//		index = q.front().second;
-	//		/*if (!first) {
-	//		getClosestVertices(G, closestV, G.vList.size(), index);
-	//		sort(closestV, closestV + G.vList.size());
-	//		}
-	//		first = false;*/
-
-	//		for (int i = 1; i < G.vList.size() && i; i++) {
-	//			// std::cout << "LOOP" << std::endl;
-	//			int fromID = index;
-	//			int toID = G.vList[closestV[i].second]->ID;
-	//			double weight = closestV[i].first;
-
-	//			if (isValidEdge(G, fromID, toID, edgePerV) && qCount < edgePerV) {
-	//				q.emplace(closestV[i]);
-	//				G.addEdge(fromID, toID, weight, false);
-	//				totDistance += weight;
-	//				qCount++;
-	//			}
-	//		}
-	//		q.pop();
-	//	}
-	//	//closestV.clear();
-	//}
-	//cout << G.getNumEdges() << " edges were created traveling in total "
-	//	<< totDistance << " miles." << endl;
-}
-
-//void randomEdges(Graph &G,int numEdges){
-//    int r1,r2;
-//    latlon from;
-//    latlon to;
-//    double d;
-//    for(int i=0;i<numEdges;i++){
-//        r1 = rand() % G.vList.size();
-//        r2 = rand() % G.vList.size();
-//        from = G.vList[r1]->location;
-//        to = G.vList[r2]->location;
-//        d = distanceEarth(from.lat,from.lon,to.lat,to.lon);
-//        G.addEdge(r1,r2,(int)d,true);
-//    }
-//}
