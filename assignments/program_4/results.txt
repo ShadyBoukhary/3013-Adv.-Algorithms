@@ -12,3 +12,13 @@ Miami,FL found at index 18952
 Edge limit per vertex: 3
 28429 edges.
 1.87046e+06 miles.
+
+Lebanon,KS found at index 17104
+Edge limit per vertex: 3
+28428 edges.
+1.89161e+06 miles.
+
+Boston,MA found at index 427
+Edge limit per vertex: 3
+28428 edges.
+764112 miles.
