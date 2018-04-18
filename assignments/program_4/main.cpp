@@ -31,6 +31,7 @@ void connectGraph(Graph&);
 
 void getLimits(Graph&, int&, int&, string&, string&);
 void getClosestVertices(Graph&, distIndexPair[], int, int);
+void fixDangler(Graph&, int, double&);
 
 // Test Driver
 int main()
@@ -199,53 +200,52 @@ void connectGraph(Graph& graph) {
 
 	// array to hold closest vertices 
 	distIndexPair * closestVectors = new distIndexPair[VSIZE];
-	for (int x = 0; x < graph.vList.size(); x++) {
-		getClosestVertices(graph, closestVectors, VSIZE, indexStarting);
+	getClosestVertices(graph, closestVectors, VSIZE, indexStarting);
 
-		// sort all vertices from closest to farthest from starting city
+	// sort all vertices from closest to farthest from starting city
+	sort(closestVectors, closestVectors + VSIZE);
+	// push starting vector on the queue
+	q.emplace(closestVectors[0]);
+	bool first = true;
+	int h = 0;
+	// connect the vertices
+	// empty queue means we're done
+	while (!q.empty()) {
+		// get index of current vertex dealt with
+		int fromIndex = q.front().second;
+		int qCount = q.size() - 1;
+
+		//if (!first) {
+		getClosestVertices(graph, closestVectors, VSIZE, fromIndex);
 		sort(closestVectors, closestVectors + VSIZE);
-		// push starting vector on the queue
-		q.emplace(closestVectors[0]);
-		bool first = true;
-		int h = 0;
-		// connect the vertices
-		// empty queue means we're done
-		while (!q.empty()) {
-			// get index of current vertex dealt with
-			int fromIndex = q.front().second;
-			int qCount = q.size() - 1;
+		//}
+		first = false;
+		// keep looking for a vertex to connect until all have been checked or limit per vertex is reached
+		for (int currentClosest = 1; currentClosest < VSIZE && graph.vList[fromIndex]->E.size() < edgeLimit; currentClosest++) {
+			// get the ID of the current closest vertex
+			int toID = graph.vList[closestVectors[currentClosest].second]->ID;
+			//if second closest has a much lower degree, use that instead
+			if (currentClosest + 3 < VSIZE && graph.vList[closestVectors[currentClosest].second]->E.size() > graph.vList[closestVectors[currentClosest + 3].second]->E.size()
+				&& isValidEdge(graph, fromIndex, toID, edgeLimit))
+				toID = graph.vList[closestVectors[currentClosest + 3].second]->ID;
+			double currentDistance = closestVectors[currentClosest].first;
 
-			//if (!first) {
-				getClosestVertices(graph, closestVectors, VSIZE, fromIndex);
-				sort(closestVectors, closestVectors + VSIZE);
-			//}
-			first = false;
-			// keep looking for a vertex to connect until all have been checked or limit per vertex is reached
-			for (int currentClosest = 1; currentClosest < VSIZE && graph.vList[fromIndex]->E.size() < edgeLimit; currentClosest++) {
-				// get the ID of the current closest vertex
-				int toID = graph.vList[closestVectors[currentClosest].second]->ID;
-				//if second closest has a much lower degree, use that instead
-				if (currentClosest + 50 < VSIZE && graph.vList[closestVectors[currentClosest].second]->E.size() > graph.vList[closestVectors[currentClosest + 50].second]->E.size()
-					&& isValidEdge(graph, fromIndex, toID, edgeLimit))
-					toID = graph.vList[closestVectors[currentClosest + 50].second]->ID;
-				double currentDistance = closestVectors[currentClosest].first;
-
-				// check if edges can be connected
-				if (isValidEdge(graph, fromIndex, toID, edgeLimit)) {
-					if (!graph.vList[fromIndex]->visited)
-						q.emplace(closestVectors[currentClosest]);
-					graph.addEdge(fromIndex, toID, currentDistance, false);
-					totalDistance += currentDistance;
-					qCount++;
-				}
+			// check if edges can be connected
+			if (isValidEdge(graph, fromIndex, toID, edgeLimit)) {
+				if (!graph.vList[fromIndex]->visited)
+					q.emplace(closestVectors[currentClosest]);
+				graph.addEdge(fromIndex, toID, currentDistance, false);
+				totalDistance += currentDistance;
+				qCount++;
 			}
-			/*cout << h++ << endl;
-			cout.flush();*/
-			graph.vList[fromIndex]->visited = true;
-			// pop the finished vertex to continue on to the next one
-			q.pop();
 		}
+		/*cout << h++ << endl;
+		cout.flush();*/
+		graph.vList[fromIndex]->visited = true;
+		// pop the finished vertex to continue on to the next one
+		q.pop();
 	}
+	fixDangler(graph, edgeLimit, totalDistance);
 	cout << graph.getNumEdges() << " edges.\n"
 		<< totalDistance << " miles." << endl;
 
@@ -277,4 +277,38 @@ void getLimits(Graph& graph, int& edgeLimit, int& index, string& starting, strin
 		cout << "Try Again.";
 	}
 }
+
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*											fixDangler()										*
+*	parameters: Graph&, int, double&															*
+*	return: void																				*
+*	looks for and fixes any dangling vertices													*
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+void fixDangler(Graph& graph, int edgeLimit, double& totalDistance) {
+	// loop through graph and find dangler
+	for (int x = 0; x < graph.vList.size(); x++) {
+		if (graph.vList[x]->E.size() == 0) {
+			// get closest cities to dangler
+			int indexStarting = x;
+			string startingCity = graph.vList[x]->city;
+			string startingState = graph.vList[x]->state;
+			latlon from, to;
+			distIndexPair * closestVectors = new distIndexPair[graph.vList.size()];
+			getClosestVertices(graph, closestVectors, graph.vList.size(), indexStarting);
+			// loop through closest cities
+			for (int y = 0; y < graph.vList.size() && graph.vList[indexStarting]->E.size() < edgeLimit; y++) {
+				int fromID = x;
+				int toID = y;
+				double currentDistance = closestVectors[y].first;
+				// connect to a valid vertex
+				if (isValidEdge(graph, fromID, toID, edgeLimit)) {
+					graph.addEdge(fromID, toID, currentDistance, false);
+					totalDistance += currentDistance;
+				}
+			}
+		}
+
+	}
+}
+
 
