@@ -306,6 +306,7 @@ void fixDangler(Graph& graph, int edgeLimit, double& totalDistance) {
 					totalDistance += currentDistance;
 				}
 			}
+			delete[] closestVectors;
 		}
 
 	}
